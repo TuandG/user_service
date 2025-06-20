@@ -26,7 +26,7 @@ public class SecurityConfiguration {
     private final CustomJwtAuthenticationConverter customJwtAuthenticationConverter;
     @Value("${app.jwt.secret-key}")
     private String secretKey;
-    private static final String[] PUBLIC_ENDPOINT = {"/auth/login", "/auth/register"};
+    private static final String[] PUBLIC_ENDPOINT = {"/auth/login", "/auth/register", "/avatar/**"};
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {

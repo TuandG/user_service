@@ -24,6 +24,8 @@ spring:
 logging:
   level:
     org.springframework.security: DEBUG
+    org.springframework.web.servlet.resource: DEBUG
+    org.springframework.web: DEBUG
 
 app:
   jwt:

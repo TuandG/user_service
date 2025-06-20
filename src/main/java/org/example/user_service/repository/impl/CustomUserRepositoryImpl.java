@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -39,7 +40,8 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
               u.first_name AS firstName,
               u.last_name AS lastName,
               u.dob,
-              u.status
+              u.status,
+              u.avatar
             FROM users u
             WHERE 1=1
             """);
@@ -97,7 +99,8 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
                         cols[4] != null ? cols[4].toString() : null,
                         cols[5] != null ? cols[5].toString() : null,
                         cols[6] != null ? LocalDate.parse(cols[6].toString()) : null,
-                        cols[7] != null && (boolean) cols[7]
+                        cols[7] != null && (boolean) cols[7],
+                        cols[8] != null ? (ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString() + "/" + cols[8].toString()) : null
                 ))
                 .toList();
         Number totalCount = (Number) countQuery.getSingleResult();

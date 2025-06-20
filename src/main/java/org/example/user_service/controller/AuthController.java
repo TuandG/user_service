@@ -8,6 +8,7 @@ import org.example.user_service.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/auth")
@@ -16,9 +17,12 @@ public class AuthController {
    private final UserService userService;
 
    @PostMapping("/register")
-   public ResponseEntity<Object> createUser(@RequestBody UserRequest userCreateRequest) {
+   public ResponseEntity<Object> createUser(
+           @RequestPart("user") UserRequest userCreateRequest,
+           @RequestPart(value = "avatar", required = false) MultipartFile avatarFile
+   ){
        try {
-           userService.createUser(userCreateRequest);
+           userService.createUser(userCreateRequest, avatarFile);
            return new ResponseEntity<>(HttpStatus.CREATED);
        } catch (AppException e) {
            return new ResponseEntity<>(e.getMessage(), e.getHttpStatus());

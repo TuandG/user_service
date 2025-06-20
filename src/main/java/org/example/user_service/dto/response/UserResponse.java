@@ -21,4 +21,5 @@ public class UserResponse {
     private String lastName;
     private LocalDate dob;
     private boolean status;
+    private String avatar;
 }

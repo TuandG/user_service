@@ -1,6 +1,7 @@
 package org.example.user_service.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.user_service.dto.request.UserLoginRequest;
 import org.example.user_service.dto.request.UserRequest;
 import org.example.user_service.dto.response.CustomPageResponse;
@@ -20,12 +21,19 @@ import org.example.user_service.utils.Token;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -34,6 +42,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
+    private static final Path ROOT = Paths.get(System.getProperty("user.dir"), "upload");
 
     @Value("${app.jwt.secret-key}")
     private String secretKey;
@@ -45,13 +54,45 @@ public class UserServiceImpl implements UserService {
     private Long expireRefreshTime;
 
     @Override
-    public void createUser(UserRequest userCreateRequest) throws AppException {
+    public void createUser(UserRequest userCreateRequest, MultipartFile avatarFile) throws AppException {
         Role role = roleRepository.findByName(RoleSystem.USER.name()).orElseThrow(() -> ExceptionUtils.ERROR_MESSAGES.get(ExceptionUtils.Error.E_ROLE_NOT_FOUND));
+
         User user = userMapper.userCreateRequestToUser(userCreateRequest);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setStatus(true);
         user.setRole(role);
-        userRepository.save(user);
+
+        String avatarPath = null;
+        Path imgDir = ROOT.resolve("avatar");
+
+        try {
+            if (avatarFile != null && !avatarFile.isEmpty()) {
+                String contentType = avatarFile.getContentType();
+                if (contentType == null || !contentType.startsWith("image/")) {
+                    throw new AppException("File is invalid format", HttpStatus.BAD_REQUEST);
+                }
+
+                Files.createDirectories(imgDir);
+                String filename = UUID.randomUUID() + "_" + avatarFile.getOriginalFilename();
+                Path savedFile = imgDir.resolve(filename);
+                avatarFile.transferTo(savedFile.toFile());
+
+                avatarPath = "avatar/" + filename;
+                user.setAvatar(avatarPath);
+            } else {
+                user.setAvatar("avatar/default-avatar.jpg");
+            }
+
+            userRepository.save(user);
+
+        } catch (Exception ex) {
+            if (avatarPath != null) {
+                try {
+                    Files.deleteIfExists(imgDir.resolve(Paths.get(avatarPath).getFileName()));
+                } catch (IOException ignored) {}
+            }
+            throw new AppException(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override

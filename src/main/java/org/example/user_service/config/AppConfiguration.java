@@ -48,6 +48,7 @@ public class AppConfiguration {
                         .status(true)
                         .role(roleRepository.findByName(RoleSystem.ADMIN.name()).get())
                         .password(passwordEncoder().encode("password"))
+                        .avatar("avatar/default-avatar.jpg")
                         .build();
                 userRepository.save(user);
             }
