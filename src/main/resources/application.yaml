@@ -1,0 +1,32 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /user-service
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/user_service
+    username: postgres
+    password: password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 5MB
+      max-request-size: 5MB
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+
+app:
+  jwt:
+    secret-key: kqF5zt6I4QcEJHy6OEDYBwv4OxgFc7CkhUoxDIn3Z7LgVv99hUbC4M6wnvZV0+zg
+    exp-acc: 24
+    exp-rf: 168
