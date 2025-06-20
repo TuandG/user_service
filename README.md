@@ -1,6 +1,6 @@
 # 🧑‍💻 User Service
 
-`user_service` là một microservice cung cấp các chức năng quản lý người dùng trong hệ thống, bao gồm:
+`user_service` là một service cung cấp các chức năng quản lý người dùng trong hệ thống, bao gồm:
 
 
 ## 🔧 Các chức năng chính
